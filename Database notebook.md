@@ -1,28 +1,79 @@
 # Database notebook
 
+### 索引
+
+假如你现在看一本书，首先肯定会先看书的目录，看看这本书到底有哪些内容，然后通过目录找到自己感兴趣的章节进行阅读
+
+这里的书就相当于数据库中的表，目录就相当于索引，查询表中的数据通过索引可以快速找到对应的数据
+
+索引的数据结构是B+树，这里的B指的是balance（平衡）
+
+```sql
+//普通索引
+alter table table_name add index index_name (column_list) ;
+//唯一索引
+alter table table_name add unique (column_list) ;
+//主键索引
+alter table table_name add primary key (column_list) ;
+```
+
+```sql
+drop index index_name on table_name ;
+
+alter table table_name drop index index_name ;
+
+alter table table_name drop primary key ;
+```
+
+ 建表时，LOGIN_NAME长度为100，这里用16，是因为一般情况下名字的长度不会超过16，这样会加快索引查询速度，还会减少索引文件的大小，提高INSERT，UPDATE的更新速度。
+
+​    如果分别给LOGIN_NAME,CITY,AGE建立单列索引，让该表有3个单列索引，查询时和组合索引的效率是大不一样的，甚至远远低于我们的组合索引。虽然此时有三个索引，但mysql只能用到其中的那个它认为似乎是最有效率的单列索引，另外两个是用不到的，也就是说还是一个全表扫描的过程。
+
+建立这样的组合索引，就相当于分别建立如下三种组合索引：
+
+```
+LOGIN_NAME,CITY,AGE
+LOGIN_NAME,CITY
+LOGIN_NAME
+```
+
+　　为什么没有CITY,AGE等这样的组合索引呢？这是因为mysql组合索引“最左前缀”的结果。简单的理解就是只从最左边的开始组合，并不是只要包含这三列的查询都会用到该组合索引。也就是说**name_city_age(LOGIN_NAME(16),CITY,AGE)从左到右进行索引，如果没有左前索引，mysql不会执行索引查询**。
+
+   如果索引列长度过长,这种列索引时将会产生很大的索引文件,不便于操作,可以使用前缀索引方式进行索引，前缀索引应该控制在一个合适的点,控制在0.31黄金值即可(大于这个值就可以创建)。
+
+
+
+
+
+
+
 
 
 ### 事务
 
 atomic原子性: 要么全部完成, 要么全部失败. 
 
-
-
 一致性consistent:   转账前后两个金额的和应该保持不变.
 
-isolation: 一个事务感受不到另一个事务在并发执行.
-
-
+isolation隔离性: 一个事务感受不到另一个事务在并发执行.
 
 durability持久性: 数据库崩溃后可以回到之前的状态. 
-
-
 
 commit , 事务启动后的更改被写入磁盘.
 
 rollback, 事务启动后的更改 回到开始前的状态.
 
+Atomic: Either all complete or all fail.
 
+Consistent: The sum of the two amount of account  before and after the transfer should remain the same.
+
+Isolation: One transaction cannot feel that another transaction is executing concurrently.
+
+Durability: After the database crashes, it can return to the previous state.
+
+commit, the changes after the transaction started are written to disk.
+
+rollback, the changes after the transaction started return to the state before the start.
 
 事务的五个状态:
 
@@ -83,10 +134,6 @@ mysql会自动为增删改语句加事务
 
 ### sql 
 
-
-
-
-
 ### **一、关系模型的三要素：**
 
 - **关系数据结构**：关系模型中只包含单一的数据结构----关系，在用户看来关系模型中数据的逻辑结构是一张扁平的二维表
@@ -129,3 +176,46 @@ D1、D2、D3的笛卡尔积为D1*D2*D3={(t1,z1,s1)(t1,z1,s2)(t1,z1,s3)(t1,z2,s1)
 **非主属性（非码属性）**：不包含任何候选码中的属性
 
 **全码**：关系模式的所有属性是这个关系模式的候选码
+
+
+
+### mysql
+
+```mermaid
+graph 
+客户端-->连接/线程处理
+客户端-->解析器
+连接/线程处理-->查询缓存
+解析器-->查询缓存
+解析器-->优化器
+优化器-->存储引擎
+```
+
+#### 第一范式(1NF)
+
+- 概念 数据表的每个字段(属性)必须是唯一的、不可分割的。
+- 唯一性 比如：在一张学生信息表里不能有两个名称都是name的字段。
+- 不可分割性 比如：在一张学生信息表不能出现类似name_mobile这样的字段，很明显name_mobile是可以分割成name和mobile两个字段的。
+
+
+
+#### 第二范式(2NF)
+
+- 概念 数据表的每条记录必须是唯一的(**主键约束**)，且非主键字段只依赖于主键。
+- 唯一性 比如说：不能同时存在id ＝ 1的记录（id为主键）。
+- 依赖性 比如说：在一张学生信息表（student_id为主键），不应该出现course_name(课程名称，依赖于course_id)这样的字段，因为，如果有一天，《心理健康教育》课程名要改成《心理健康教育杂谈》，就得改课程表和学生信息表的课程名称了。
+
+
+
+#### 第三范式(3NF)
+
+- 概念 数据表中不应该存在多余的字段，也就是说每个字段都不能由其他字段推理得到。
+- 例子 比如说：学生信息表里不能同时存在province_id(省份ID)、city_id(城市ID)这两个字段，因为province_id可以由city_id推理得到
+
+
+
+#### 逆范式
+
+- 概念 就是不按照标准的范式去设计数据库
+- 逆 在数据库的实践过程中，我们可能遇到数据量非常大的数据表，这时候去做join查询是非常损耗性能的，甚至导致数据库连接超时、挂掉等问题。所以呢，有时候就需要数据库多冗余设计，对一些字段做冗余，以避免大表之间的join。 
+
