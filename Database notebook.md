@@ -179,7 +179,7 @@ graph
 - 概念 就是不按照标准的范式去设计数据库
 - 逆 在数据库的实践过程中，我们可能遇到数据量非常大的数据表，这时候去做join查询是非常损耗性能的，甚至导致数据库连接超时、挂掉等问题。所以呢，有时候就需要数据库多冗余设计，对一些字段做冗余，以避免大表之间的join。 
 
-### lec2
+### Lec2
 
 relational model
 
@@ -192,8 +192,6 @@ relational model
 ##### 四种基本操作
 
 Set intersection   **交** 
-
-
 
 自然连接: 一般都是笛卡尔积然后选择, 就把这两个操作组合叫做自然连接. natural join. 这是连表查询中最常见的
 
@@ -213,9 +211,108 @@ deletion 就是减法.
 
 update就是广义投影操作. 
 
+### Lec3 SQL
+
+1975年IBM发明.
+
+ANSI (American National standard institute)提出标准, 从SQL86到SQL99.
+
+SQL92 在商业化软件用的最多. 
+
+SQL92和99标准分为4级,  但是没有DBMS 产品达到第四级full SQL level.
+
+因为oracle 要保证自己的unique， 不可替代性, 不能容易被替换掉. 所以故意20%和别人不一样。 
+
+##### 三种
+
+DDL 
+
+```sql
+Create view, drop view
+Create index, ..
+Create table , alter table
+Create trigger 
+```
+
+DML 
+
+select , insert , delete , update 
+
+DCL控制
+
+Grant, revoke 权限控制
+
+#### DDL
+
+创建表
+
+可以用check 来检查属性
+
+primary key 可以设置到列名后面， 或者在声明所有列后再设置
+
+删除表
+
+用drop， 会删除数据和schema， delete是删除数据内容
+
+alter table
+
+改变schema， 新增列， 改变属性的类型， 改变完整性约束。
+
+##### 创建索引
+
+```sql
+create index <i-name> on <table-name>(attribute)
+create unique index 
+```
 
 
 
+#### DML
 
+select 对应的是投影操作
 
+from 多个表对应的是笛卡尔积
 
+select 大小写不敏感。 支持下划线。 
+
+distinct 去重 ， all 不做去重，默认是all。 
+
+where 可以用between and 
+
+学习这些还是看作业实践一下， 有例子就好很多 。
+
+改名， 可以简化。 还有自己和自己比较的时候必须rename分裂成两个实例。
+
+##### 字符串操作
+
+`% 匹配字符串， 类似于 *`
+
+`_ 匹配单个字符，类似于？`
+
+`select “abv” || name`  可以实现拼接。
+
+order by 根据字母序排序， 默认升序， desc 是降序。 可以多个属性排序， 比如可以： ` orderby a, b desc, c` 
+
+##### 集合操作
+
+并union  交 intersect 补 except ， 后面加all表示 retain all duplicates。 
+
+聚合函数
+
+例如取平均值 `select avg(balance) group by branch_name ` 
+
+聚合函数 `  count(name) tot_num  `可以直接跟着重命名，不用as.还可以 `count(distinct name)`  先去重再count 。
+
+having和where 后面都是布尔表达式 ， having 是分组完成之后才能做的  ， where是分组完成之前的。 先做的放在where。 
+
+##### 书写过程
+
+from -> where-> group -> having -> select -> distinct - > order by
+
+如果聚合的值要判断， 就having 
+
+大部分认为null是0 ， count可能会把null计入。 
+
+#### 视图
+
+`create view <v_name> as select c1,c2 from ... ` 启动应用的时候加载到内存， 调用的时候比较快。
