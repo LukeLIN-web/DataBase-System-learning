@@ -15,6 +15,8 @@ alter table table_name add index index_name (column_list) ;
 alter table table_name add unique (column_list) ;
 //主键索引
 alter table table_name add primary key (column_list) ;
+一个主键可以有多个列.学生的名字、年龄、班级都可能重复，无法使用单个字段来唯一标识，这时，我们可以将多个字段设置为主键，形成复合主键，这多个字段联合标识唯一性
+复合主键就是含有一个以上的字段组成,如ID+name,ID+phone等,而联合主键要同时是两个表的主题组合起来的。这是和复合主键最大的区别
 ```
 
 ```sql
@@ -187,7 +189,9 @@ relational model
 
 做笛卡尔积之前, 先尽量把别的选择操作做了. 
 
-改名操作, 可以用来找最大账户balance.  内部实现是rename笛卡尔积, 然后
+改名操作, 可以用来找最大账户balance.  内部实现是rename笛卡尔积.
+
+关系代数的投影是集合操作, 自动去重. sql要加distinct.
 
 ##### 四种基本操作
 
@@ -199,9 +203,9 @@ theta连接, 自然连接之后根据theta条件来查询.
 
 除法操作. 当涉及到求“全部”之类的查询，常用“除法”
 
-广义投影 , 加了选择, 运算. 
+广义投影 , 加了选择, 运算.
 
-聚合函数,  
+聚合函数
 
 方便起见, 我们可以在聚合函数中直接rename. 
 
@@ -211,7 +215,7 @@ deletion 就是减法.
 
 update就是广义投影操作. 
 
-### Lec3 SQL
+### Lec3 SQL1
 
 1975年IBM发明.
 
@@ -281,7 +285,7 @@ where 可以用between and
 
 学习这些还是看作业实践一下， 有例子就好很多 。
 
-改名， 可以简化。 还有自己和自己比较的时候必须rename分裂成两个实例。
+改名， 可以简化。 还有自己和自己比较的时候必须rename分裂成两个实例
 
 ##### 字符串操作
 
@@ -305,7 +309,11 @@ order by 根据字母序排序， 默认升序， desc 是降序。 可以多个
 
 having和where 后面都是布尔表达式 ， having 是分组完成之后才能做的  ， where是分组完成之前的。 先做的放在where。 
 
-##### 书写过程
+用法
+
+group by 如果有两个并列最大, 就会出错. 
+
+##### 执行顺序
 
 from -> where-> group -> having -> select -> distinct - > order by
 
@@ -316,3 +324,108 @@ from -> where-> group -> having -> select -> distinct - > order by
 #### 视图
 
 `create view <v_name> as select c1,c2 from ... ` 启动应用的时候加载到内存， 调用的时候比较快。
+
+ 建立在单个基本表上的视图，且视图的列对应表的列，称为“行列视图”。 可以写入.  多张表的视图不能写入. 
+
+View 是虚表，对其进行的所有操作都将转化为对基表的操作。
+
+查询操作时，VIEW与基表没有区别，但对VIEW的更新操作有严格限制，如只有行列视图，可更新数据。
+
+### Lec4 SQL2
+
+#### 嵌套查询
+
+from子句中
+
+```sql
+where col not in (select col from table1)
+-- 甚至还可以tuple 
+where (br, col) in (select br, col from xxxx)
+```
+
+```sql
+-- Find the account_number with the maximum balance for every branch. 每组求最大值, 比较复杂
+WHERE balance >= max(balance) 
+-- 这样写是不行的,  因为还没分组, 查出来的是整个表最大的, 而不是每个branch最大的. 
+
+SELECT account_number, max(balance) 
+FROM account  -- 这样写也不行
+
+-- 表的自比较,需要重命名,答案如下
+SELECT account_number AN, balance 
+FROM account  A 
+WHERE balance >= (SELECT max(balance)               FROM account B
+WHERE A.branch_name = B.branch_name)
+ORDER by balance
+```
+some
+
+some是sql保留字, 就是一个数字不能大于一个集合, some就是说比其中一个大就行.  
+
+some可能大于是ture, 小于也是true 等于也是true.   大于全部要用all 关键字
+
+```sql
+WHERE assets > some
+(SELECT assets 
+ FROM branch 
+ WHERE branch_city = ‘Brooklyn’)
+```
+
+select语句中没有关系代数的除法操作, 要依靠 not exists, except 组合实现. 
+
+#### unique 关键字
+
+找到最多只有一个的数据.
+
+`where unique xx`
+
+Oracle 8 and SQL Server 7 do not support unique and not unique
+
+#### 临时表
+
+(不管是否被引用，导出表(或称嵌套表)必须给出别名) 
+
+```sql
+from (select  xxx )
+as result (branch_name,avg_bal)
+```
+
+#### with语句
+
+作为select 前面的一些准备. 比如可以产生临时表
+
+这整个是sql语句
+
+```sql
+with tmptable(value) as 
+  select xx 
+  from xx 
+select bb
+from tmptable
+```
+
+with 可以有多个, 但是只有一个主语句会用这些with产生的临时表, 主语句结束后别的语句不认. 
+
+#### 删除
+
+在同一SQL语句内，除非外层查询的元组变量引入内层查询，否则层查询只进行一次。
+
+#### 插入
+
+也可以跟select 语句, 把select结果插入到另一个表. 
+
+#### 更新
+
+update语句, 可以用case关键字.
+
+```sql
+UPDATE account 
+SET balance = case 
+when  balance <= 10000 
+then balance * 1.0 
+else balance * 1.06 
+end
+```
+
+
+

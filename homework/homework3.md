@@ -17,27 +17,28 @@ from customer, borrow
 where borrower.id = customer.id
 ```
 
-` `  不存在怎么弄？  用except
+不存在怎么弄？  用except
 
 b. Find the ID of each customer who lives on the same street and in the same city as customer '12345'. 
 
-等于另一个怎么弄？ 
+等于另一个怎么弄？  嵌套查询
 
 ```sql
-select 
-
+select  id
+from customer  
+where (street, city ) in ( select street,city 
+      from customer
+      where id = '12345')
 ```
 
+c. Find the name of each **branch** that has at least **one customer** who has an account in the bank and who lives in “Harrison”
 
-
-c. Find the name of each branch that has at least one customer who has an account in the bank and who lives in “Harrison”
-
-大于等于1 怎么弄？ 
+大于等于1 怎么弄？  自然连接连接上了就说明肯定有一个. 
 
 ```sql
-select branch.branch_name 
-from customer,branch 
-where count(depositer) >= 1 and customer.city = 'Harrison
+select distinct account.branch_name
+from account, customer, depositor
+where customer.id = depositor.id and  customer.customer_city = 'Harrison' and account.account_number = depositor.account_number 
 ```
 
 3.9
@@ -75,50 +76,55 @@ select employee.id from works, employee where works.id = employee.id and works.c
 d. Find the ID of each employee who earns more than every employee of “Small Bank Corporation”. 
 
 ```sql
-select employee.id 
-from works, employee 
-where works.id = employee.id and  
-group by 
-having  > max()
+     SELECT id
+	     FROM works 
+          WHERE salary >= (SELECT max(salary) 
+				      FROM works 
+			                   WHERE company_name ='Small Bank Corporation' ) 
 ```
 
 having 是分组完成之后才能做的  ， where是分组完成之前的。
 
 e. Assume that companies may be located in several cities. Find the name of each company that is located in every city in which “Small Bank Corporation” is located. 
 
+怎么保证每个都有?
+
+如果有一个不在, 就去掉这个公司的名字. 
+
 ```sql
-select company.name
-from works, employee 
-where works.id = employee.id
-group by 
-having  > max()
+SELECT company_name
+FROM company
+WHERE not exists (
+SELECT city
+FROM company
+except
+SELECT city
+FROM company 
+WHERE company_name = 'Small Bank Corporation'
+);
 ```
-
-
 
 f. Find the name of the company that has the most employees (or companies, in the case where there is a tie for the most). 
 
-
-
 ```sql
-
+select company_name
+from works 
+group by company_name
+having count(id) >= (select count(id) 
+                     from works 
+                     group by company_name) 
 ```
-
-
-
-
 
 g. Find the name of each company whose employees earn a higher salary, on average, than the average salary at “First Bank Corporation”.
 
-
-
 ```sql
-
+select company_name
+from works 
+group by company_name
+having avg(salary) > all (select avg(salary)
+                     from works 
+                     where company_name = 'First Bank Corporation' ) 
 ```
-
-
-
-
 
 3.10
 
@@ -127,22 +133,21 @@ Consider the relational database of Figure 3.19. Give an expression in SQL for e
 a. Modify the database so that the employee whose ID is '12345' now lives in “Newtown”. 
 
 ```sql
-
+update employee 
+set city = 'Newtown'
+where id = '12345'
 ```
-
-
-
-
 
 b. Give each manager of “First Bank Corporation” a 10 percent raise unless the salary becomes greater than $100000; in such cases, give only a 3 percent raise.
 
 ```sql
-
+update works
+set salary = case
+			when salary> 100000 then salary*1.1
+			else salary*1.03
+			end
+where company_name = 'First Bank Corporation'
 ```
-
-
-
-
 
  3.11
 
@@ -153,8 +158,6 @@ a. Find the ID and name of each student who has taken at least one Comp. Sci. co
 ```sql
 
 ```
-
-
 
 
 
