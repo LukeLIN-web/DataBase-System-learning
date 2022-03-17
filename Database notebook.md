@@ -426,6 +426,3 @@ then balance * 1.0
 else balance * 1.06 
 end
 ```
-
-
-
