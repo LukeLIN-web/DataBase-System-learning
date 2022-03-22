@@ -426,3 +426,186 @@ then balance * 1.0
 else balance * 1.06 
 end
 ```
+
+#### 连接
+
+inner join 内连接就是自然连接, 两边都要有. 
+
+left outer join左外连接, 产生结果行数等于左边的行数, 找不到就设置为null
+
+full outer join , 左外连接的结果 UNION 右外连接的结果.
+
+自然连接：*R* natural {inner join, left join, right join, full join} *S*  把公共属性去重.
+
+还可以非自然连接：
+
+```sql
+R{inner join, left join, right join, full join} S
+on <连接条件判别式>
+using (<同名的等值连接   属性名>) 
+```
+
+Key word *Inner*, *outer* is optional, 是可以省略的
+
+**Natural join:** 以同名属性相等作为连接条件
+
+**Inner join**：只输出匹配成功的元组
+
+**Outer join：**还要考虑不能匹配的元组
+
+ 非自然连接，容许不同名属性的比较，且结果关系中不消去重名属性, aka, 结果可能会有同名的属性.
+
+使用using的连接类似于natural连接，但仅以using列出的公共属性为连接条件. 
+
+Find the names of courses that have maximum average score. 
+
+可能有多个课都一样高, 就要用 in 
+
+```sql
+SELECT course_name 
+FROM course 
+WHERE course_no in   -- 可能有多个课都一样高
+    (SELECT course_no 
+	FROM study 
+	GROUP BY course_no 
+	HAVING avg(score) >= all 
+		(SELECT avg(score) 
+		 FROM study 
+  		 GROUP BY course_no)) 
+```
+
+### lec5 高级sql
+
+create type
+
+create new domain ,  domain可以加限制条件,
+
+```sql
+create domain dollars as numeric(2,2) not null;
+create table employee (
+	eno char(10) primary key,
+    salary dollars
+);
+```
+
+大对象类型 blob(20MB)  clob 最大10KB
+
+#### 外键
+
+是作为integrity constraint
+
+Assume there exists relations *r* and *s*: *r*(*A*, *B*, *C*), *s*(*B*, D), we say attribute *B* in *r* is a foreign key from relation *r*, and *r* is called *referencing relation* (参照关系), and *s* is called *referenced relation* (被参照关系)*.* 
+
+ØE.g., 学生(学号, 姓名, 性别, 专业号, 年龄) --- 参照关系 
+
+​    专业(专业号, 专业名称) --- 被参照关系 (目标关系) 
+
+​    其中属性专业号称为关系*学生*的外码。 
+
+Ø*Account*(*account-number*, *branch-name*, *balance*) --- 参照关系 
+
+ *Branch*(*branch-name*, *branch-city*, *assets*) --- 被参照关系 
+
+参照关系中外码的值必须在被参照关系中实际存在，或为null. 
+
+ 专业删除的时候, 要看学生, 不能随意删除. 要么 rejected as an error, 要么 tuples in *t*2 that references *t*1 must themselves be deleted (cascading deletions are possible). 
+
+学生插入的时候, 要检查在专业中存在.  
+
+cascading action 
+
+Note: Referential integrity is only checked at the end of a transaction !!  因为可能有环.
+
+#### 断言
+
+```sql
+ CREATE ASSERTION <assertion-name> 
+  CHECK <predicate>; 
+```
+
+sql没有说都存在, 只能用 not exist 嵌套 not exist.
+
+#### 触发器
+
+account update 后, 就执行动作
+
+```sql
+CREATE TRIGGER overdraft-trigger after update on account 
+	referencing new row as nrow for each row 
+	-- new row 是保留关键字, 表示改的那一行. 
+	when nrow.balance < 0 
+	  begin atomic -- 要么全部执行, 要么全部不执行. 
+		insert into borrower 
+			(select customer-name, account-number from depositor 
+	 		 where nrow.account-number = depositor.account-number) 
+	    	insert into loan values 
+			(nrow.account-number, nrow.branch-name, – nrow.balance) 
+	    	update account set balance = 0 
+			where account.account-number = nrow.account-number 
+	    end 
+```
+
+- Triggering event can be insert, delete or update. 
+
+- Triggers on update can be restricted to specific attributes：
+
+E.g., Create trigger *overdraft-trigger*
+
+​      after update of *balance* on *account …* 
+
+- Values of attributes before and after an update can be referenced: 
+
+Referencing old row as: for deletes and updates 
+
+Referencing new row as: for inserts and updates 
+
+##### 语句触发器
+
+多行数据修改
+
+`for each statement` instead of `for each row` 
+
+ `referencing old table` or `referencing new table` to refer to temporary tables (called *transition tables*) containing the affected rows 
+
+ Can be more efficient when dealing with SQL statements that update a large number of rows 
+
+##### External World Actions 
+
+Triggers cannot be used to directly implement external-world actions, 
+
+但是 Triggers can be used to record actions-to-be-taken in a separate table. Have an external process that repeatedly scans the table, carries out external-world actions and deletes action from table. 
+
+例子如下:  这就是做一次补货
+
+```sql
+CREATE TRIGGER reorder-trigger after update of level on inventory 
+	referencing old row as orow, new row as nrow 
+   	for each row 
+		when nrow.level <= (select level 
+			                      from minlevel 
+			                      where minlevel.item = nrow.item) 
+                   and orow.level > (select level 
+			                      from minlevel 
+		                                   where minlevel.item = orow.item)  -- 容易忘记判断orow, 新一次低于了就补货. 不能每次都低于都补货. 
+	begin 
+		insert into orders 
+			(select item, amount 
+			 from reorder 
+		              where reorder.item = orow.item) 
+	end 
+```
+
+sql server 			Inserted, deleted 相当于前法的*nrow* (称为过渡表, transition table)和*orow* 
+
+```sql
+CREATE TRIGGER overdraft-trigger on account
+ for update as 
+ if inserted.balance < 0 
+```
+
+
+
+
+
+
+
