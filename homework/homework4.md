@@ -9,19 +9,19 @@ create table employee (
     ID int, 
     person_name varchar(50),
     street varchar(50),
-    city varchar(50)
+    city varchar(50),
 	primary key ID);
 create table works (
     ID int, 
     company_name varchar(50),
-    salary int
+    salary int,
     FOREIGN KEY (ID)
     REFERENCES employee (ID),
     FOREIGN KEY (company_name)
     REFERENCES company (company_name));
 create table company (
     company_name varchar(50),
-    city varchar(50)
+    city varchar(50),
     primary key (company_name));
 create table manages (
     ID int, 

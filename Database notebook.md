@@ -492,7 +492,11 @@ create table employee (
 
 #### 外键
 
-是作为integrity constraint
+是作为integrity constraint.
+
+FOREIGN KEY 约束用于预防破坏表之间连接的行为。
+
+FOREIGN KEY 约束也能防止非法数据插入外键列，因为它必须是它指向的那个表中的值之一。
 
 Assume there exists relations *r* and *s*: *r*(*A*, *B*, *C*), *s*(*B*, D), we say attribute *B* in *r* is a foreign key from relation *r*, and *r* is called *referencing relation* (参照关系), and *s* is called *referenced relation* (被参照关系)*.* 
 
@@ -513,6 +517,16 @@ Assume there exists relations *r* and *s*: *r*(*A*, *B*, *C*), *s*(*B*, D), we s
 学生插入的时候, 要检查在专业中存在.  
 
 cascading action 
+
+```sql
+create table account(...foreign key( br) references brtable
+on delete cascade
+on update cascade,
+                     ...
+)
+```
+
+如果删除brtable中的tuple, 那么account中也会删除.  除了cascade还可以set null 或者 set default.
 
 Note: Referential integrity is only checked at the end of a transaction !!  因为可能有环.
 
@@ -571,7 +585,7 @@ Referencing new row as: for inserts and updates
 
 ##### External World Actions 
 
-Triggers cannot be used to directly implement external-world actions, 
+Triggers cannot be used to directly implement external-world actions
 
 但是 Triggers can be used to record actions-to-be-taken in a separate table. Have an external process that repeatedly scans the table, carries out external-world actions and deletes action from table. 
 
@@ -595,7 +609,7 @@ CREATE TRIGGER reorder-trigger after update of level on inventory
 	end 
 ```
 
-sql server 			Inserted, deleted 相当于前法的*nrow* (称为过渡表, transition table)和*orow* 
+sql server  Inserted, deleted 相当于前法的*nrow* (称为过渡表, transition table)和*orow* 
 
 ```sql
 CREATE TRIGGER overdraft-trigger on account
@@ -603,9 +617,81 @@ CREATE TRIGGER overdraft-trigger on account
  if inserted.balance < 0 
 ```
 
+#### grant
+
+所谓Role，可以认为是一个权限的集合，这个集合有一个统一的名字，就是Role名，你可以为多个账户赋予统一的某个Role的权限，而权限的修改可以直接通过修改Role来实现，而无需每个账户逐一GRANT权限，大大方便了运维和管理。
+
+Role可以被创建，修改和删除，并作用到其所属于的账户上。
+
+https://developer.aliyun.com/article/60654
+
+如果user1将 select access 通过granted by current role 给另一个user2 授予, 即使user1的role被收回, user2还是可以拥有这个role.
+
+#### Authorization
+
+grant 可以传递,  从DBA为root 形成一个authorization graph
+
+##### Privileges in SQL 
+
+增删改查, 还有reference. 
+
+`grant select on branch to U1 with grant option`  with grant option 可以传递 , gives U1 the select privileges on *branch* and allows U1 to grant this privilege to others. 
+
+回收权限 
+
+REVOKE <privilege list> ON <table | view> 
+
+​     FROM <user list> [restrict | cascade] 
+
+```sql
+Revoke select on branch from U1, U3 cascade; // U1赋予别人的也都会回收
+Revoke select on branch from U1, U3 restrict;
+```
+
+authorization 不会控制到每一行, 资源消耗太大. 
+
+##### audit trails 
+
+E.g., `audit table by scott by access whenever successful` ---- 审计用户scott每次成功地执行有关table的语句 (create table, drop table, alter table)。 
+
+例子2 `audit delete, update on student` --- 审计所有用户对student表的delete和update操作。 
+
+q怎样看审计结果：
+
+Ø审计结果记录在数据字典表: sys.aud$中，也可从dba_audit_trail, dba_audit_statement, dba_audit_object中获得有关情况。
+
+Ø上述数据字典表需在DBA用户（system）下才可见。
+
+#### 嵌入式sql
+
+:*V_an*, :*bn*, :*bal*是宿主变量，可在宿主语言程序中赋值，从而将值带入SQL。宿主变量在宿主语言中使用时不加:号。
+
+#### ODBC
+
+```c
+  if (error == SQL_SUCCESS) { 
+	  SQLBindCol(stmt, 1, SQL_C_CHAR, branchname,80, &lenOut1); 
+	  SQLBindCol(stmt, 2, SQL_C_FLOAT, &balance, 0, &lenOut2); 
+	  /* 对stmt中的返回结果数据加以分离，并与相应变量绑定。第1项数据转换为C的字符
+	  类型，送变量branchname(最大长度为80)， lenOut1为实际字符串长度（若＝-1代表
+	  null），第2项数据转换为C的浮点类型送变量balance中 */ 
+	  while ( SQLFetch(stmt) >= SQL_SUCCESS) { /* 逐行从数据区stmt中取数据，放到绑定变量中 */ 
+	  printf (“ %s  %d\n”, branchname, balance); 
+            /*  对取出的数据进行处理*/       … …          } 
+				      }   …… 
+	} 
+	  SQLFreeStmt(stmt, SQL_DROP);  /* 释放数据区*/ 
+```
+
+### Lec6 实体关系模型
 
 
 
+super key,
 
+candidate key , 最小的super key, 小一个就不能作为super key
 
+有箭头表示一对一, 没有箭头表示一对多
+
+全参与和部分参与. 
 
