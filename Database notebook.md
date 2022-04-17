@@ -685,13 +685,11 @@ q怎样看审计结果：
 
 ### Lec6 实体关系模型
 
-
-
-super key,
+super key
 
 candidate key , 最小的super key, 小一个就不能作为super key
 
 有箭头表示一对一, 没有箭头表示一对多
 
-全参与和部分参与. 
+全参与和部分参与. weak entity set 
 
