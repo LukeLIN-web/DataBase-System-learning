@@ -693,6 +693,7 @@ q怎样看审计结果：
 
 ### Lec6 实体关系模型
 
+<<<<<<< HEAD
 #### Entity Sets
 
 实体是一个对象， 可以是具体的，也可以是抽象的。
@@ -706,20 +707,13 @@ domain： 就是值域
 #### keys
 
 super key,
+=======
+super key
+>>>>>>> 11b390e630397a3cf9b7cf4c4c1f6bca99f36e56
 
 candidate key , 最小的super key, 小一个就不能作为super key
 
 有箭头表示一对一, 没有箭头表示一对多
-
-
-
-primary key可以叫做码
-
-参与一个联系集的各实体集的primary keys的组合，构成该联系集的超码
-
-作为码的属性不能为空，值不应常变. 
-
-全参与和部分参与. 
 
 #### 弱实体集
 
