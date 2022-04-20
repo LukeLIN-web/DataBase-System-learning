@@ -688,12 +688,19 @@ q怎样看审计结果：
 `ROLLUP`是`GROUP BY`子句的扩展。 `ROLLUP`选项允许包含表示小计的额外行，通常称为超级聚合行，以及总计行。 通过使用`ROLLUP`选项，可以使用单个查询生成多个[分组集](http://www.yiibai.com/sql/sql-grouping-sets.html)。
 
 
+primary key可以叫做码
 
+参与一个联系集的各实体集的primary keys的组合，构成该联系集的超码
 
+作为码的属性不能为空，值不应常变. 
+
+全参与和部分参与. 
+=======
+
+全参与和部分参与. weak entity set 
 
 ### Lec6 实体关系模型
 
-<<<<<<< HEAD
 #### Entity Sets
 
 实体是一个对象， 可以是具体的，也可以是抽象的。
@@ -704,12 +711,9 @@ domain： 就是值域
 
 一个联系集表示二个或多个实体集之间的关联 
 
-#### keys
-
-super key,
+super key
 =======
 super key
->>>>>>> 11b390e630397a3cf9b7cf4c4c1f6bca99f36e56
 
 candidate key , 最小的super key, 小一个就不能作为super key
 
