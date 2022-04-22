@@ -694,9 +694,6 @@ primary key可以叫做码
 
 作为码的属性不能为空，值不应常变. 
 
-全参与和部分参与. 
-=======
-
 全参与和部分参与. weak entity set 
 
 ### Lec6 实体关系模型
@@ -798,9 +795,230 @@ candidate key , 最小的super key, 小一个就不能作为super key
 对于N元联系集，如果连接到它的边没有箭头，那么主码就是所有参加实体集的主码属性的并集。
 如果有一个边有一个箭头的话，那就除去那一边的实体集的主码属性，其他的取并集作为联系的主码。
 
-#### 4月19日
+## 4月19日规范化理论
+
+考点:
+
+第三范式, BCNF, 分解的全部内容. 
 
 
+
+##### 不好的设计
+
+1. 信息重复
+
+如果把cs系修改了, 那所有老师都要修改.
+
+2. 插入异常
+
+key是老师id, 如果没有老师就没法插入系. 存在别的决定关系, 比如deprt name可以决定building . 这时候就需要分解.
+
+3. 更新困难.
+
+#### 无关属性
+
+a-》ß in F.  如果a去掉属性A , 也成立依赖, 那 A就是在a中多余的.
+
+a-》ß in F.  如果ß去掉属性A , 也成立依赖, 那 A就是在ß中多余的.
+
+### 分解
+
+#### 无损连接
+
+怎么样是无损链接?  
+
+无损连接分解的条件： 分解后的二个子模式的共同属性必须是R1或R2的码（适用于一分为二的分解）。 要确保有公共属性. 这样就是无损连接 
+
+R1 交R2 函数决定R1
+
+或者 R2交R1 函数决定R2 . 就是无损连接.
+
+等价于,  if R1∩R2 forms a superkey for either R1 or R2
+
+The decomposition is a lossless-join decomposition (无损连接分解). 
+The decomposition is dependency preservation (依赖保持). 每个函数依赖还是有实现.
+Each relation Ri is in a good form --- BCNF or 3NF. 
+
+
+
+
+
+#### 函数依赖
+
+如果都满足完整性约束,就称为合法的. legal instance, 
+
+如果任意两个tuple t1,t2, t1[x] = t2[x]  => t1[y] = t2[y] 那么 x函数决定y, y函数依赖于x . 即  x->y
+
+ K 是超码  《=》 K -> R.  能决定所有属性
+
+K 是候选码 《=》  K  -> R, and  No a属于 K, a ->  R (不存在K的真子集a，使之满足a ->  R) 
+
+如果 Y是X的子集, 那么 x-》 y 是一个平凡trivial函数依赖.无论合法不合法都成立.
+
+除了平凡的函数依赖, 剩下的都是key.   这样就是一个好的关系模式.
+
+闭包,对于我们做题没啥意义, 但是计算机辅助是可以计算整个闭包.枚举所有函数依赖.
+
+ 
+
+好的关系模式, 左边都是key.
+
+armstrong 公理系统 , 有效sound和完备的complete.
+
+1. 两边同时加一个属性 , 函数依赖也成立.  (augmentation, 增补律) 
+2.  (transitivity, 传递律) 
+
+3. A-》BC, 那么A决定B, A决定C
+
+ a y -〉ß y 和 a y-〉ß是等价的. 就是右边去掉也成立.
+
+A的闭包就是A能决定的属性的集合.
+
+闭包能决定所有属性, 就可以作为key. 如果真子集不能作为key, 那它就是candidate key候选码.
+
+ae的闭包就是a的闭包+e的闭包.
+
+```visual basic
+			result := a; 
+		  while (changes to result) do 
+		      for each ß > y in F do 
+              begin 
+				      If ß 属于 result then y加到result
+		          end; 
+		      a+ := result 
+```
+
+看起来 复杂, 其实思路还是很直接的.
+
+##### Canonical Cover (正则覆盖) 
+
+最简覆盖,
+
+写成最简函数依赖. 
+
+F是最小覆盖
+
+1. f的闭包和fc的闭包是一样的.
+2. fc没有无关属性
+3. 左边一样的都合并 a->b.  a->c都要合并为 a-》bc
+
+算法
+
+1. 先把左边一样的合并
+2. 看哪些是多余属性, 画出**连接图**
+
+ad决定e, d决定e, 求正则覆盖那就d-》e
+
+
+
+### BCNF
+
+定义: A relation schema R is in BCNF, F 是函数依赖的集合, if 所有函数依赖 in F+ of the form a决定ß , at least one of the following holds: 
+
+​		a的所有函数决定都是trivial 的
+​		or 
+​		 a is a superkey for R (i.e., R 是a闭包的子集,  a函数决定 R) 
+
+怎么证明不是 BCNF.
+
+有一个alpha 不是key
+
+#### 怎么分解成BCNF?
+
+1 要是无损的
+
+2 每个分解出的关系模式都是BCNF的
+
+基本思想: 如果不是bcnf,  至少有一条函数依赖左边不是k，这条函数依赖单独拿出来分解。
+
+```verilog
+result := {R}; 
+	done := false; 
+	compute F+; 
+	while (not done) do 
+	  if (there is a schema Ri in result that is not in BCNF) 
+			then begin 
+		    let a->b be a nontrivial functional 
+		    dependency that holds on Ri such 
+		    that a-> Ri is not in F+, and a交b 为空集; 
+        result := (result – Ri) 并 (a, b) 并 (Ri – b); //
+	    	 end
+    else done := true; 
+    //将Ri分解为二个子模式: Ri1 = (a, b)和Ri2 = (Ri – b), b是 Ri1 Ri2的共同属性. 
+//Note: Finally, every sub-schema is in BCNF, and the decomposition is lossless-join. 
+
+```
+
+
+
+∵F+是由Armstrong的3个公理从F推出的, 而任何公理都不会使Functional Dependency (FD)左边变小(拆分), 故如果F中没有违反BCNF的FD (即左边是superkey), 则F+中也不会. 
+
+可在F下判别R是否违反BCNF, 但必须在F+下判别R的分解式是否违反BCNF. 
+
+
+
+#### 依赖保持
+
+如果通过检验单一关系上的函数依赖, 就能确保原来所有的函数依赖成, 那么这样的分解就是依赖保持的dependency preserving. 
+
+
+
+不一定所有BCNF的分解都是依赖保持的.
+
+很多时候就是不能共得. 有时候就不用BCNF规范, 用3范式.
+
+
+
+### 3范式
+
+Definition: A relation schema R is in third normal form (3NF) if for all      in F+, at least one of the following conditions holds: 
+前两个是BCNF
+Each attribute A in ß – a is contained in a candidate key for R (即A in ß – a是主属性, 若a 和ß没有交集, 则A = ß是主属性). 
+Note: each attribute may be in a different candidate key. 
+
+
+
+讨论: 国内其他教材关于3NF的定义: 不存在非主属性对码的部分依赖和传递依赖. 该定义实际是说, 当为非主属性时, 必须是码; 但当为主属性时, 则无限制. 国内外这二种定义本质上是一致的. 
+
+
+
+```verilog
+Let Fc be a canonical cover for F; 
+i := 0; 
+for each functional dependency a -> ß in Fc do 
+	{if none of the schemas Rj, 1 <=j <= i contains a ß, 
+	      then begin 
+		    i := i  + 1; 
+          Ri := (a ß)  //将Fc中的每个 a -> ß分解为子模式Ri := (a ß), 从而保证 dependency-preserving. 
+	      end} 
+if none of the schemas Rj,  1 <=j <= i contains a candidate key for R then 
+begin 
+	i := i  + 1; 
+	Ri := any candidate key for R; //保证至少在一个Ri中存在R的候选码, 从而保证 lossless-join. 
+
+end 
+return (R1, R2, ..., Ri) 
+```
+
+讨论: 对于多于二个子模式Ri (i > 2)的分解, 判别是否无损连接的方法, 其他教材中是用一张i行n列的表来表示. 如果各子模式中函数依赖的相关性使得R中所有的属性都涉及, 则是无损连接分解. 而根据候选码的含义, 候选码必与所有属性相关. 从而二者本质上一致. 
+
+怎么证明是第三范式?
+
+各个Ri自然连接起来就是R
+
+#### 多值依赖
+
+为什么多值属性需要转换成单个关系? 是BCNF,但是不满足第四范式,  存在非平凡的多值依赖
+
+#### 4 范式
+
+
+
+##### L1 范式
+
+每个属性是原子的, 不可分的.
+
+不要编码各种信息到学号里, 这样提取太慢了. 每个信息都原子的.
 
 B- C 范式
 
@@ -812,5 +1030,4 @@ BC 范式一定是第三范式， 第三范式不一定是BC范式。 可能是�
 
 BC范式可能丢掉函数关系， 第三范式因为不分解所以保留。
 
-最精简集合。
-
+### 
