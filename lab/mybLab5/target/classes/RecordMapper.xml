@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="recordMapper">
+
+    <select id="findcard" resultType="org.lab5.Card">
+        select *   from Records where cid = #{cid}
+    </select>
+    <select id="showBooks" resultType="org.lab5.Book">
+        select Book.ISBN, Book.Category, Book.Title,Book.Publisher, Book.pubyear, Book.Author, Book.Price, Book.Total, Book.Inventory
+        from Book,Records
+        where  Records.cid  = #{cid}
+        and Book.ISBN = Records.ISBN
+    </select>
+</mapper>

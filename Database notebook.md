@@ -1,4 +1,4 @@
-# Database notebook
+#  Database notebook
 
 作业答案： https://wenku.baidu.com/view/69529f1aaf1ffc4ffe47acd9.html
 
@@ -801,7 +801,7 @@ candidate key , 最小的super key, 小一个就不能作为super key
 
 第三范式, BCNF, 分解的全部内容. 
 
-
+https://www.win.tue.nl/~sidorova/informatica6/some-solutions-chapter7.pdf
 
 ##### 不好的设计
 
@@ -841,7 +841,7 @@ Each relation Ri is in a good form --- BCNF or 3NF.
 
 
 
-
+有损分解: 公共属性c不是任何一个表的key, 就会损失原来表的信息, 因为他可以重名.
 
 #### 函数依赖
 
