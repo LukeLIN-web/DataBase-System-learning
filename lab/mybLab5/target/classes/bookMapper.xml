@@ -45,8 +45,18 @@
     <select id="showBooks" resultType="org.lab5.Book">
         select *
         from Book
-        where Book.ISBN = #{ISBN}
+        where ISBN = #{ISBN}
     </select>
+    <update id="borrowbook">
+        update book
+        set Inventory = Inventory - 1
+        where ISBN = #{ISBN}
+    </update>
+    <update id="returnbook">
+        update book
+        set Inventory = Inventory + 1
+        where ISBN = #{ISBN}
+    </update>
     <insert id="insertBook" parameterType="org.lab5.Book">
         INSERT INTO Book(`ISBN`, `Category`, `Title`, `Publisher`, pubyear, `Author`, Price, Total, Inventory)
         VALUES (#{ISBN},

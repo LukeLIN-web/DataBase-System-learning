@@ -26,7 +26,7 @@ public class Main {
         // Reading data using readLine
 //        command = reader.readLine();
 //        int com = Integer.parseInt(command);
-        com = 3;
+        com = 4;
         normalUser user = new normalUser();
         while (com != 9) {
             if (com == 1) {

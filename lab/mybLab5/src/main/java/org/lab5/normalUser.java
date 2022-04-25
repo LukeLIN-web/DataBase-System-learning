@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class normalUser {
 
     private static final Logger logger = LoggerFactory.getLogger(normalUser.class);
 
-    public void borrowBook() {
+    public void borrowBook() throws IOException {
         logger.info("""
                  please enter 1 or 2 . input 9 will exit\s
                 1 show books\s
@@ -38,29 +39,99 @@ public class normalUser {
         );
         String str = null;
         BufferedReader databf = new BufferedReader(new InputStreamReader(System.in));
+        // 借书的实现：
+        // 如果有库存， 那 book update库存- 1， records  插入，  isbn 来自输入， cid来自输入，Borrowtime是现在的时间
+        // due是40天， aid是输入。
+        //如果没有库存， 那么找到records， 找到最快的归还时间。
         while ((str = databf.readLine()) != null) {
-            int com = Integer.parseInt(str);
+//            int com = Integer.parseInt(str);
+            int com = 2;
             // find Records cardnum ->   isbn -> book. info
             if (com == 1) {
-                String cardnum = databf.readLine();
-                List<Record> recordlist = session.selectOne("recordMapper.showRecords", cardnum);
+                logger.info("please input card id:");
+                Integer cid = Integer.parseInt(databf.readLine());
+                logger.info("showing all books...");
+                List<Record> recordlist = session.selectList("recordMapper.showRecords", cid);
                 for (Record r : recordlist) {
-                    Book book = session.selectOne("BookMapper.showBooks", r.getISBN());
-                    System.out.print(book);
+                    Book book = session.selectOne("bookMapper.showBooks", r.getISBN());
+                    System.out.println(book);
                 }
             } else {
-                String isdn = databf.readLine();
-                Book book = session.selectOne("BookMapper.showBooks", isdn);
-                if (book.getInventory() > 0){
-                    session.update("")
+                // borrow book
+//                Integer cardnum = Integer.parseInt(databf.readLine());
+//                Integer aid = Integer.parseInt(databf.readLine());
+                Integer aid = 1;
+                Integer cardnum = 1;
+                logger.info("please input isdn:");
+                String isbn = databf.readLine();
+                logger.info("searching books...");
+                Book book = session.selectOne("bookMapper.showBooks", isbn);
+                Record record = new Record(isbn, cardnum, aid);
+                if (book.getInventory() > 0) {
+                    session.update("bookMapper.borrowbook", isbn);
+                    session.insert("recordMapper.insertOne", record);
+                    session.commit();
+                    logger.info("borrow book success!");
+                } else {
+                    logger.error("This book doesn't have inventory!");
+                    List<Record> recordlist = session.selectList("recordMapper.findNearestDue", isbn);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    logger.info("The nearest due is : "+sdf.format(recordlist.get(0).getDue()));
                 }
             }
         }
     }
 
     public void returnBook() throws IOException {
-
+        logger.info("""
+                 please enter 1 or 2 . input 9 will exit\s
+                1 show books\s
+                2 return book
+                """
+        );
+        String str = null;
+        BufferedReader databf = new BufferedReader(new InputStreamReader(System.in));
+        // 还书的实现：
+        while ((str = databf.readLine()) != null) {
+//            int com = Integer.parseInt(str);
+            int com = 2;
+            if (com == 1) {
+                logger.info("please input card id:");
+                Integer cid = Integer.parseInt(databf.readLine());
+                logger.info("showing all books...");
+                List<Record> recordlist = session.selectList("recordMapper.showRecords", cid);
+                for (Record r : recordlist) {
+                    Book book = session.selectOne("bookMapper.showBooks", r.getISBN());
+                    System.out.println(book);
+                }
+            } else {
+                // return book
+//                Integer cardnum = Integer.parseInt(databf.readLine());
+//                Integer aid = Integer.parseInt(databf.readLine());
+                Integer aid = 1;
+                Integer cid = 2;
+                logger.info("please input isdn:");
+                String isbn = databf.readLine();
+                logger.info("searching books...");
+                List<Record> recordlist = session.selectList("recordMapper.showRecords", cid);
+                boolean flag = false;
+                for (Record r : recordlist) {
+                    if (r.getISBN().equals(isbn)) {
+                        session.update("bookMapper.returnbook", isbn);
+                        session.delete("recordMapper.deleteOne", r);
+                        session.commit();
+                        logger.info("return book success!");
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag == false)
+                    logger.error("This book isn't borrowed! ");
+            }
+        }
     }
+
+
 
     public void queryBook() throws IOException {
         System.out.print("""
