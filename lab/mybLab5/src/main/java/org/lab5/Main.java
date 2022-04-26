@@ -1,5 +1,6 @@
 package org.lab5;
 
+import org.lab5.entity.Admin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,29 +22,27 @@ public class Main {
         // Enter data using BufferReader
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
-        int com;
+
         String command;
         // Reading data using readLine
-//        command = reader.readLine();
-//        int com = Integer.parseInt(command);
-        com = 4;
+        command = reader.readLine();
+        int com = Integer.parseInt(command);
         normalUser user = new normalUser();
         while (com != 9) {
             if (com == 1) {
                 admin ad = new admin();
-//                System.out.println("please enter admin id");
-//                if (1== 1){
-//                String Adminid = reader.readLine();
-//                Emp corradmin = ad.findadmin(Integer.parseInt(Adminid));
-//                if (Integer.parseInt(Adminid) ==  corradmin.getAid())
-//                    System.out.println("please enter admin password");
-//                String Adminpassword = reader.readLine();
-//                if (corradmin.getPassword().equals(Adminpassword)) {
-//                    System.out.println("login successful!");
+                System.out.println("please enter admin id");
+                String Adminid = reader.readLine();
+                Admin corradmin = ad.findadmin(Integer.parseInt(Adminid));
+                if (Integer.parseInt(Adminid) == corradmin.getAid())
+                    System.out.println("please enter admin password");
+                String Adminpassword = reader.readLine();
+                if (corradmin.getPassword().equals(Adminpassword)) {
+                    System.out.println("login successful!");
                     ad.adminProc();
-//                } else {
-//                    System.out.println("ID/password error!");
-//                }
+                } else {
+                    System.out.println("ID/password error!");
+                }
             } else if (com == 2) {
                 user.queryBook();
             } else if (com == 3) {
@@ -57,7 +56,6 @@ public class Main {
             com = Integer.parseInt(command);
         }
     }
-
 
 
 }

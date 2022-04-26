@@ -4,6 +4,9 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.lab5.entity.Book;
+import org.lab5.entity.Record;
+import org.lab5.entity.queryCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +47,7 @@ public class normalUser {
         // due是40天， aid是输入。
         //如果没有库存， 那么找到records， 找到最快的归还时间。
         while ((str = databf.readLine()) != null) {
-//            int com = Integer.parseInt(str);
-            int com = 2;
+            int com = Integer.parseInt(str);
             // find Records cardnum ->   isbn -> book. info
             if (com == 1) {
                 logger.info("please input card id:");
@@ -58,10 +60,8 @@ public class normalUser {
                 }
             } else {
                 // borrow book
-//                Integer cardnum = Integer.parseInt(databf.readLine());
-//                Integer aid = Integer.parseInt(databf.readLine());
-                Integer aid = 1;
-                Integer cardnum = 1;
+                Integer cardnum = Integer.parseInt(databf.readLine());
+                Integer aid = Integer.parseInt(databf.readLine());
                 logger.info("please input isdn:");
                 String isbn = databf.readLine();
                 logger.info("searching books...");
@@ -93,8 +93,7 @@ public class normalUser {
         BufferedReader databf = new BufferedReader(new InputStreamReader(System.in));
         // 还书的实现：
         while ((str = databf.readLine()) != null) {
-//            int com = Integer.parseInt(str);
-            int com = 2;
+            int com = Integer.parseInt(str);
             if (com == 1) {
                 logger.info("please input card id:");
                 Integer cid = Integer.parseInt(databf.readLine());
@@ -106,9 +105,8 @@ public class normalUser {
                 }
             } else {
                 // return book
-//                Integer cardnum = Integer.parseInt(databf.readLine());
-//                Integer aid = Integer.parseInt(databf.readLine());
-                Integer aid = 1;
+                Integer cardnum = Integer.parseInt(databf.readLine());
+                Integer aid = Integer.parseInt(databf.readLine());
                 Integer cid = 2;
                 logger.info("please input isdn:");
                 String isbn = databf.readLine();

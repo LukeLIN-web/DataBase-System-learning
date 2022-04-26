@@ -4,6 +4,9 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.lab5.entity.Book;
+import org.lab5.entity.Card;
+import org.lab5.entity.Admin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,13 +105,13 @@ public class admin {
         }
     }
 
-    public Emp findadmin(int aid) throws IOException {
+    public Admin findadmin(int aid) throws IOException {
         //4.通过namespace+id找到要执行的sql语句并执行sql语句
-        Emp admin = session.selectOne("EmpMapper.selectemp", aid);
+        Admin admin = session.selectOne("EmpMapper.selectemp", aid);
         return admin;
     }
 
     public void findAll() throws IOException {
-        List<Emp> list = session.selectList("EmpMapper.findAll");
+        List<Admin> list = session.selectList("EmpMapper.findAll");
     }
 }

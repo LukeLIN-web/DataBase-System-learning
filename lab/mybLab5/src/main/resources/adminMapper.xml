@@ -8,10 +8,10 @@
 
 <mapper namespace="EmpMapper">
 
-    <select id="findAll" resultType="org.lab5.Emp">
+    <select id="findAll" resultType="org.lab5.entity.Admin">
         select *   from Administrator
     </select>
-    <select id="selectemp" resultType="org.lab5.Emp">
+    <select id="selectemp" resultType="org.lab5.entity.Admin">
         select *   from Administrator where aid = #{aid}
     </select>
 </mapper>

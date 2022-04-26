@@ -1,6 +1,6 @@
-package org.lab5;
+package org.lab5.entity;
 
-public class Emp {
+public class Admin {
     private Integer aid;
     private String password;
     private String Name;

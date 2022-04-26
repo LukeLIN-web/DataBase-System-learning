@@ -8,15 +8,15 @@
 
 <mapper namespace="cardMapper">
 
-    <select id="findcard" resultType="org.lab5.Card">
+    <select id="findcard" resultType="org.lab5.entity.Card">
         select *   from Records where cid = #{cid}
     </select>
-    <select id="showRecord" resultType="org.lab5.Record">
+    <select id="showRecord" resultType="org.lab5.entity.Record">
         select *
         from Records
         where  Records.cid  = #{cid}
     </select>
-    <insert id="insertOne" parameterType="org.lab5.Card">
+    <insert id="insertOne" parameterType="org.lab5.entity.Card">
         INSERT INTO LibCard (cid, `name`, `unit`, `category`)
         VALUES (#{cid},
                 #{name},

@@ -8,7 +8,7 @@
 
 <mapper namespace="bookMapper">
 
-    <select id="findBooks" resultType="org.lab5.Book">
+    <select id="findBooks" resultType="org.lab5.entity.Book">
         select *
         from Book
         <where>
@@ -42,7 +42,7 @@
             </if>
         </where>
     </select>
-    <select id="showBooks" resultType="org.lab5.Book">
+    <select id="showBooks" resultType="org.lab5.entity.Book">
         select *
         from Book
         where ISBN = #{ISBN}
@@ -57,7 +57,7 @@
         set Inventory = Inventory + 1
         where ISBN = #{ISBN}
     </update>
-    <insert id="insertBook" parameterType="org.lab5.Book">
+    <insert id="insertBook" parameterType="org.lab5.entity.Book">
         INSERT INTO Book(`ISBN`, `Category`, `Title`, `Publisher`, pubyear, `Author`, Price, Total, Inventory)
         VALUES (#{ISBN},
                 #{Category},

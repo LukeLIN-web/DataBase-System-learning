@@ -8,12 +8,12 @@
 
 <mapper namespace="recordMapper">
 
-    <select id="showRecords" resultType="org.lab5.Record">
+    <select id="showRecords" resultType="org.lab5.entity.Record">
         select *
         from Records
         where Records.cid = #{cid}
     </select>
-    <insert id="insertOne" parameterType="org.lab5.Record">
+    <insert id="insertOne" parameterType="org.lab5.entity.Record">
         INSERT INTO Records (`ISBN`, cid, BorrowTime, Due, AID)
         VALUES (#{ISBN},
                 #{cid},
@@ -21,7 +21,7 @@
                 #{Due},
                 #{AID})
     </insert>
-    <delete id="deleteOne" parameterType="org.lab5.Record">
+    <delete id="deleteOne" parameterType="org.lab5.entity.Record">
         delete
         from Records
         where ISBN = #{ISBN}
@@ -31,7 +31,7 @@
           and AID = #{AID}
     </delete>
 
-    <select id="findNearestDue" resultType="org.lab5.Record">
+    <select id="findNearestDue" resultType="org.lab5.entity.Record">
         select *
         from Records
         where Due = ( (select min(Due) from Records where ISBN = #{ISBN}))

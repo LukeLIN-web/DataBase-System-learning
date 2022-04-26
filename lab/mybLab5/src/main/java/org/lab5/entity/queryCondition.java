@@ -1,4 +1,6 @@
-package org.lab5;
+package org.lab5.entity;
+
+import org.lab5.entity.Book;
 
 public class queryCondition extends Book {
     private Double Price2;

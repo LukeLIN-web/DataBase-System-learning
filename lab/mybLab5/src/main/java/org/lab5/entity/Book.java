@@ -1,4 +1,4 @@
-package org.lab5;
+package org.lab5.entity;
 
 public class Book {
 

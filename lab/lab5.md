@@ -6,7 +6,35 @@
 
 ## 1系统整体架构
 
- 
+ 本项目使用Java语言开发， maven管理依赖。
+
+### 工程结构
+
+```python
+myLab5
+├── .idea 
+├── databooks # 存储多批导入图书的数据
+├── pom.xml # 确定包依赖
+├── logs # log4j日志记录文件
+├── src
+│   ├── java/org.lab5
+│   │   ├── entity # 存储对应数据库的实体类
+│   │   │   ├── Book
+│   │   │   ├── Card
+│   │   │   ├── Admin # 管理员类
+│   │   │   ├── queryCondition # 针对区间查询，继承Book类加入两个属性传入mybatis
+│   │   │   ├── Record # 借书记录
+│   │   ├── admin # 管理员登陆后的一些方法
+│   │   ├── Main # 程序入口
+│   │   ├── admin # 借书， 还书，查询三个方法
+│   ├── resources
+│   │   ├── bookMapper.xml # 操作book数据库的sql语句
+│   │   ├── cardMapper.xml
+│   │   ├── adminMapper.xml
+│   │   ├── recordMapper.xml
+│   │   ├── log4j.properties # log4j的配置文件
+│   │   ├── mybatis-config.xml # mybatis的配置文件
+```
 
 选项4个, 1 ,管理员登陆 2 图书查询 3 借书 4 还书
 
@@ -40,7 +68,7 @@ DBC是Java DataBase Connectivity的缩写，它是Java程序访问数据库的�
 
 root的密码: nlchcg123
 
- 
+我们不直接写JDBC的resultset， 而是用mybatis包装，可以直接操作实体类。 
 
 #### mybatis
 
@@ -60,9 +88,7 @@ MyBatis的查询结果集都是自动映射封装的，单行查询将数据库�
 
 #### 范围查询
 
-我新增加了一个类叫做queryCondition.java，并让该类继承Books类,里面属性是Year2,Price2,并生成get、set方法。
-
-<where> 和 <if> 标签.动态SQL,实现不确定条件
+新增加了一个类叫做queryCondition.java，并让该类继承Books类,里面属性是Year2,Price2,并生成get、set方法。 利用mybatis中的<where> 和 <if> 标签， 实现动态SQL不确定条件的查询。
 
 传入样例
 
