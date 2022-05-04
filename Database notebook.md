@@ -1030,4 +1030,42 @@ BC 范式一定是第三范式， 第三范式不一定是BC范式。 可能是�
 
 BC范式可能丢掉函数关系， 第三范式因为不分解所以保留。
 
-### 
+### lec8存储和数据结构
+
+cache 最快， 0.5 ns
+
+内存 10-100ns  比磁盘大概快100万倍。
+
+flash ， 读可以和内存差不多， 写10us。 
+
+SATA 150MB/s，
+
+ RAID0 ， 没有重复
+
+RAID1 ， 1比1 备份。
+
+RAID5 ， N+1 存N个。 
+
+#### buffer manager
+
+替换策略
+
+LRU的块可能是下面快要用的块(循环)，而最近刚用过的块则暂时不用，当空间不够时倒是可以将其覆盖的, 故LRU策略不佳。MRU strategy (Most recently used, 最近最常用策略反而比较好。
+
+Toss-immediate  strategy用后立即free space
+
+#### 文件组织
+
+固定长度记录还是变长记录
+
+
+
+   
+
+##### 顺序存储
+
+需要定期对文件重新排序
+
+多表Multitable Clustering File Organization
+
+有助于联合查询，不利于单个表查询。 

@@ -18,6 +18,12 @@ E → A
 
 R1 和R2交集是A, A-》B, A-〉 C,  所以A是R1的super key. 所以是无损连接.
 
+答案：
+
+同上。
+
+
+
 7.3, 
 
 Explain how functional dependencies can be used to indicate the following: 
@@ -32,6 +38,12 @@ F1 = {student ->instructor , instructor -> student}
 
 F2 = {instructor ->student}
 
+答案：  一对一，同样的值 instructor 有同样的student。
+
+多对一， 同样的student 有一样的instructor。多个stu也有一样的instructor。
+
+
+
 7.21, 
 
 Give a lossless decomposition into BCNF of schema R of Exercise 7.1
@@ -44,6 +56,10 @@ B->D. 是非平凡的,而且B不是superkey, 所以要分解.把D作为ß拆出R
 
 B是R2的超码, =》无损的.
 
+
+
+
+
 7.22, 
 
 Give a lossless, dependency-preserving decomposition into 3NF of schema R of Exercise 7.1.
@@ -55,6 +71,10 @@ Give a lossless, dependency-preserving decomposition into 3NF of schema R of Exe
 所以可以根据正则覆盖直接分解
 
 R = {(A,B,C) , (C,D,E) , (B,D), (E,A) } (A,B,C)  包含一个候选吗, 所以是无损的. 依赖保持, 3NF.
+
+
+
+
 
 7.29
 
