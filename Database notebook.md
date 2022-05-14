@@ -1069,3 +1069,19 @@ Toss-immediate  strategy用后立即free space
 多表Multitable Clustering File Organization
 
 有助于联合查询，不利于单个表查询。 
+
+
+
+#### lec9 
+
+LSM 树.
+
+
+
+
+
+#### lec10 查询优化
+
+作业答案:
+
+https://www.db-book.com/db6/practice-exer-dir/12s.pdf
