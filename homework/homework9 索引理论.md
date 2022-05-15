@@ -40,6 +40,8 @@ In write-optimized trees such as the LSM tree or the stepped-merge index, entrie
 
 
 
+
+
 24.10
 
 The stepped merge variant of the LSM tree allows multiple trees per level. What are the tradeoffs in having more trees per level?
