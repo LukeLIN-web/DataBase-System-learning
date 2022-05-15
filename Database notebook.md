@@ -1122,8 +1122,55 @@ update 要从上到底全部update.  这样太慢了, 策略是插入一个新�
 
 
 
-#### lec10 查询优化
+#### lec10 查询处理和优化
 
 作业答案:
 
 https://www.db-book.com/db6/practice-exer-dir/12s.pdf
+
+1. 语法分析和翻译
+2. 优化
+3. 执行
+
+考点:
+
+连接运算
+
+Estimate the number of block transfers and seeks required using each of the following join strategies 
+
+#### Nested-loop join  嵌套循环连接
+
+```python
+for  tr in r :
+	for ts in s :
+        if tr, ts 满足条件: 
+            加入结果
+```
+
+#### Block nested-loop join 
+
+```
+for each Br in r:
+	for each Bs in s:
+        for tr in Br :
+            for ts in Bs :
+                if tr, ts 满足条件: 
+                    加入结果
+```
+
+最坏情况下, 
+
+#### Merge join 
+
+归并连接
+
+```
+```
+
+
+
+#### Hash join
+
+```
+```
+

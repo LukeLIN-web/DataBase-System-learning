@@ -20,23 +20,29 @@ Query:
 
 Let relations r1(A, B, C) and r2(C, D, E) have the following properties: r1 has 20,000 tuples, r2 has 45,000 tuples, 25 tuples of r1 fit on one block, and 30 tuples of r2 fit on one block. Estimate the number of block transfers and seeks required using each of the following join strategies for r1 ⋈ r2: 
 
-r1 需要 800 个块，r2 需要 1500 个块。 如果有 M 页内存。 如果 M > 800，则可以在 1500 + 800 个磁盘中直接连接访问，甚至使用普通的嵌套循环连接。 所以我们只考虑 M ≤ 800 页。
+r1 需要 800 个块，r2 需要 1500 个块。 设 M 页内存。  M > 800，则可以在 1500 + 800 个磁盘中直接连接访问，甚至使用普通的嵌套循环连接。 所以我们只考虑 M ≤ 800 页。
 
 a. Nested-loop join.  嵌套循环连接
 
- r1 作为outer关系，我们需要 20000 ∗ 1500 + 800 =
-30、000、800 次磁盘访问，如果 r2 是外部关系，我们需要 45000 ∗
-800 + 1500 = 36001500 次磁盘访问。
+ r1 作为外部关系，我们需要 20000 ∗ 1500 + 800 =30,000,800 次磁盘访问，
+
+如果 r2 是外部关系，我们需要 45000 ∗800 + 1500 = 36,001,500 次磁盘访问。
 
 b. Block nested-loop join. 
+
+
 
 c. Merge join. 
 
 ![image-20220514174011881](/Users/juyilin/Library/Application Support/typora-user-images/image-20220514174011881.png)
 
+
+
 d. Hash join.
 
 ![image-20220514175540055](/Users/juyilin/Library/Application Support/typora-user-images/image-20220514175540055.png)
+
+
 
 15.6
 
