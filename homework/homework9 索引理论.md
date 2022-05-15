@@ -2,7 +2,7 @@
 
 
 
-14.3  Construct a B+-tree for the following set of key values: (2, 3, 5, 7, 11, 17, 19, 23, 29, 31) 680 Chapter 14 Indexing Assume that the tree is initially empty and values are added in ascending order. Construct B+-trees for the cases where the number of pointers that will fit in one node is as follows: 
+14.3  Construct a B+-tree for the following set of key values: (2, 3, 5, 7, 11, 17, 19, 23, 29, 31)  Assume that the tree is initially empty and values are added in ascending order. Construct B+-trees for the cases where the number of pointers that will fit in one node is as follows: 
 
 a. Four 
 
@@ -30,14 +30,25 @@ a. Insert 9. b. Insert 10. c. Insert 8. d. Delete 23. e. Delete 19
 
 
 
-
-
 14.11
 
 In write-optimized trees such as the LSM tree or the stepped-merge index, entries in one level are merged into the next level only when the level is full. Suggest how this policy can be changed to improve read performance during periods when there are many reads but no updates.
 
-在 LSM 树或步进合并索引等写优化树中，只有在该级别已满时，才会将一个级别中的条目合并到下一个级别。 建议如何更改此策略以提高读取次数多但没有更新期间的读取性能。
+在 LSM 树或步进合并索引等写优化树中，只有在该级别已满时，才会将一个级别中的条目合并到下一个级别。 如果读取次数多但没有update期间的, 如何更改此策略以提高读取性能
+
+
 
 
 
 24.10
+
+The stepped merge variant of the LSM tree allows multiple trees per level. What are the tradeoffs in having more trees per level?
+
+LSM树的阶梯式合并变体允许每层有多个树。每层有更多的树有什么权衡？
+
+ 优点: 树更多,  一级可以放的也更多, merge 的次数就更少. 
+
+缺点是: merge 的时候时间更久, 然后总共占用的空间也更多.
+
+
+
