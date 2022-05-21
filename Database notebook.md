@@ -1132,9 +1132,25 @@ https://www.db-book.com/db6/practice-exer-dir/12s.pdf
 2. 优化
 3. 执行
 
+sjl 5月7日 第六节课.
+
+线性搜索。ts + br * tT 一次搜索, 然后br次 传输, 假设是连续存放的. 要把整个文件都塞到内存中.
+
+索引搜索 : (hi+1) * ( t T+ ts)。hi 代表索引的高度.
+
+什么是磁盘搜索?
+
+
+
 考点:
 
 连接运算
+
+这些好像很难理解, 还是背诵吧. 
+
+ r 记录10000 ,  磁盘块数。400 
+
+s 记录 5000,  磁盘块数, 100 
 
 Estimate the number of block transfers and seeks required using each of the following join strategies 
 
@@ -1147,6 +1163,12 @@ for  tr in r :
             加入结果
 ```
 
+要检查  nr *ns = 10000 乘 5000 个元组
+
+最坏 , 块要传输,  nr * bs + br ,    就是包含r的都要传输, 然后对于每个r中的元组, 要传输包含s的各个块.  搜索, 读取r的次数, 然后包含r的次数.  
+
+br是包括r中tuple的块数,   nr是r中的tuple数. 
+
 #### Block nested-loop join 
 
 ```
@@ -1158,7 +1180,9 @@ for each Br in r:
                     加入结果
 ```
 
-最坏情况下, 
+最坏情况下,  br * bs + br 次块传输. 
+
+假设都是连续放置的, 
 
 #### Merge join 
 
