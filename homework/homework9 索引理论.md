@@ -58,6 +58,8 @@ In write-optimized trees such as the LSM tree or the stepped-merge index, entrie
 
 在 LSM 树或步进合并索引等写优化树中，只有在该级别已满时，才会将一个级别中的条目合并到下一个级别。 如果读取次数多但没有update期间的, 如何更改此策略以提高读取性能
 
+
+
 24.10
 
 The stepped merge variant of the LSM tree allows multiple trees per level. What are the tradeoffs in having more trees per level?
