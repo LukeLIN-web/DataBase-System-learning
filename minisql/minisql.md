@@ -43,8 +43,6 @@ Begin是怎么获得首迭代器的?
 
 怎么找到下一个叶节点?
 
-
-
 行（Row）：在src/include/record/row.h中被定义，与元组的概念等价，用于存储记录或索引键，一个Row由一个或多个Field构成。
 
 ```
@@ -54,15 +52,11 @@ class IndexIterator  就会传入INDEX_TEMPLATE_ARGUMENTS
 比如传入一个IndexIterator<GenericKey<32>, RowId, GenericComparator<32> 
 ```
 
-
-
 #### 算法
 
 首先得到最左边的叶子.
 
 然后
-
-
 
 叶子节点提供了什么?
 
@@ -125,4 +119,33 @@ IndexIterator<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE> iter = index->GetBeg
     EXPECT_EQ(ans * 100, (*iter).second);
   }
 ```
+
+
+
+问题:
+
+## parser
+
+```
+create database db0; // root 的type = kNodeCreateDB, 值为null children type= kNodeIdentifier,  值为db0
+drop database db0;
+show databases;
+use db0;
+show tables;
+create table t1(a int, b char(20) unique, c float, primary key(a, c));
+create table t1(a int, b char(0) unique, c float, primary key(a, c));
+```
+
+
+
+#### 创建数据库
+
+```
+explicit DBStorageEngine(std::string db_name, bool init = true,
+                         uint32_t buffer_pool_size = DEFAULT_BUFFER_POOL_SIZE)
+                         // 新建一个数据库实例, 
+                         // 存储在哪里?
+```
+
+
 
