@@ -1246,6 +1246,16 @@ for each Br in r:
 
 
 
+### 可恢复性
+
+Recoverable schedule
+
+Cascadeless schedules — cascading rollbacks cannot occur;
+
+数据库并发控制原理 - Smith的文章 - 知乎 https://zhuanlan.zhihu.com/p/464283526
+
+
+
 
 
 ### 2阶段锁协议
@@ -1270,3 +1280,7 @@ for each Br in r:
 
 2. 是否冲突串行化?
 3. 是否有可能由2PL protocol Chans这个schedule? 请解释.
+
+
+
+cascadeless schedule
