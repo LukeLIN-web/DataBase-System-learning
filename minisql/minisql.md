@@ -6,6 +6,14 @@ https://zg3aga.yuque.com/hbre0c 我们的yuque
 
 https://www.bilibili.com/video/BV1VL411w72p?p=5
 
+
+
+参考 https://github.com/xingdl2007/cmu15-445
+
+https://github.com/nefu-ljw/database-cmu15445-fall2020/blob/main/src/include/storage/index/index_iterator.h
+
+
+
 1. allocatge page ,  新建了分区后 bitmap 不应该从磁盘中读出.
 2. 数据映射用小数据查看是否正确.
 3. 更新文档, 描述算法.对照自己的描述看一遍算法.
@@ -25,21 +33,27 @@ debug心得
 1. 需要自己加一些报错, 多加if  判断.  
 2. 不要在乎时间复杂度. 完成就行. 不然很容易完不成. 
 
+### disk manager
+
+问题： 
+
+启动第二个dbinstance时，  allocate Allocate page 会把已经占用的page 当作空的再次分配。
+
+
+
+
+
+
+
 
 
 ### index 迭代器
 
 Begin是怎么获得首迭代器的?
 
-
-
 怎么组织为单向链表?
 
-
-
 叶节点存储的是rowid, 那么怎么获得rowid?
-
-
 
 怎么找到下一个叶节点?
 
@@ -134,9 +148,31 @@ use db0;
 show tables;
 create table t1(a int, b char(20) unique, c float, primary key(a, c));
 create table t1(a int, b char(0) unique, c float, primary key(a, c));
+drop table t1;
+create index idx1 on t1(a, b);
+-- "btree" can be replaced with other index types
+create index idx1 on t1(a, b) using btree;
+drop index idx1;
+show indexes;
+select * from t1;
+select id, name from t1;
+select * from t1 where id = 1;
+-- note: use left association
+select * from t1 where id = 1 and name = "str";
+select * from t1 where id = 1 and name = "str" or age is null and bb not null;
+insert into t1 values(1, "aaa", null, 2.33);
+delete from t1;
+delete from t1 where id = 1 and amount = 2.33;
+update t1 set c = 3;
+update t1 set a = 1, b = "ccc" where b = 2.33;
+begin;
+commit;
+rollback;
+quit;
+execfile "a.txt";
 ```
 
-
+看图 http://dreampuf.github.io/GraphvizOnline/
 
 #### 创建数据库
 
@@ -147,5 +183,13 @@ explicit DBStorageEngine(std::string db_name, bool init = true,
                          // 存储在哪里?
 ```
 
+问题:  idx = 0 , 1->100
 
+delete有问题
+
+```
+for (; iter != index->GetEndIterator(); ++iter) {
+!= 的时候 itr 为NULL, 所以报错.  
+因为只有节点的时候node没有赋值.
+```
 
