@@ -14,6 +14,12 @@ https://github.com/nefu-ljw/database-cmu15445-fall2020/blob/main/src/include/sto
 
 
 
+disk manager的具体实现方式
+
+
+
+
+
 1. allocatge page ,  新建了分区后 bitmap 不应该从磁盘中读出.
 2. 数据映射用小数据查看是否正确.
 3. 更新文档, 描述算法.对照自己的描述看一遍算法.
@@ -35,17 +41,9 @@ debug心得
 
 ### disk manager
 
-问题： 
+问题： 启动第二个dbinstance时，  allocate Allocate page 会把已经占用的page 当作空的再次分配。
 
-启动第二个dbinstance时，  allocate Allocate page 会把已经占用的page 当作空的再次分配。
-
-
-
-
-
-
-
-
+解决方法： 之前没有写入metapage。
 
 ### index 迭代器
 
@@ -141,12 +139,13 @@ IndexIterator<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE> iter = index->GetBeg
 ## parser
 
 ```
-create database db0; // root 的type = kNodeCreateDB, 值为null children type= kNodeIdentifier,  值为db0
+execfile "sql.txt";
+create database db0;
 drop database db0;
 show databases;
 use db0;
 show tables;
-create table t1(a int, b char(20) unique, c float, primary key(a, c));
+create table t2(d int, e char(25), f float);
 create table t1(a int, b char(0) unique, c float, primary key(a, c));
 drop table t1;
 create index idx1 on t1(a, b);
@@ -160,16 +159,13 @@ select * from t1 where id = 1;
 -- note: use left association
 select * from t1 where id = 1 and name = "str";
 select * from t1 where id = 1 and name = "str" or age is null and bb not null;
-insert into t1 values(1, "aaa", null, 2.33);
+insert into t1 values(1, "aaa", 2.33);
 delete from t1;
 delete from t1 where id = 1 and amount = 2.33;
 update t1 set c = 3;
 update t1 set a = 1, b = "ccc" where b = 2.33;
-begin;
-commit;
-rollback;
 quit;
-execfile "a.txt";
+
 ```
 
 看图 http://dreampuf.github.io/GraphvizOnline/
@@ -193,3 +189,36 @@ for (; iter != index->GetEndIterator(); ++iter) {
 因为只有节点的时候node没有赋值.
 ```
 
+
+
+问题
+
+1. col name不对， 怀疑是 schema name最后没有截断\0
+
+Field 加了截断\0 还是不对。 
+
+create table传入之前是对的， 执行过程看了一遍也都是对的。
+
+因为 columns，  在函数中用 memheap ， ALLOC_COLUMN 在函数结束的时候会释放内存。
+
+发现的方法： gdb一步步看， 在函数return的时候会释放栈中的变量。
+
+2. 从磁盘中读取db文件时  categories manager出错。
+
+3. insert之后 select不对。 
+
+因为const char *Type::GetData(const Field &val) const  方法没有实现。 
+
+可能原因：  创建的时候没有确定type的类型， 所以是基类而不是子类。
+
+因为char.getdata有独特的包装， 需要单独判断。  
+
+但是怎么获得float 和int？ protected也不能直接访问 
+
+头疼， float转char[ ] ， 还需要新开char数组。
+
+4. ShowIndexes ，idx_info->GetIndexKeySchema()->GetColumns(); 是空的。 
+
+优先级不高， 不显示也行。 
+
+5. 
