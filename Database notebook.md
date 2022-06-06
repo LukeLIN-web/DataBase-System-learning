@@ -1284,3 +1284,147 @@ Cascadeless schedules — cascading rollbacks cannot occur;
 
 
 cascadeless schedule
+
+
+
+## lec15 数据库恢复
+
+考点
+
+WAL (write-ahead logging)
+
+undo & redo, compensation log
+
+checkpoint, fuzzy checkpoint
+
+dump
+
+remote backup
+
+logical undo (& physical redo), operation logging
+
+ARIES (analysis, redo, undo)
+
+#### 事务故障恢复
+
+1. 扫描日志， 找到更新操作
+2. undo 所有更新操作
+3. 直到读到事务的开始标记
+
+#### 系统故障 
+
+一些提交的事务还留在缓冲区。 可能停电或CPU故障
+
+1. 正向扫描日志， 找出已经提交的事务（有begin 和commit） 把他们放入redo 队列找出未完成的事务（有begin 没有commit）放入undo 队列
+2. 处理undo队列， 把日志记录中“更新前的值”写入
+3. 处理redo 队列， 把日志记录中“更新后的值”写入
+
+#### media 故障
+
+磁盘数据破坏
+
+1. 装入最新的backup 数据库副本， 
+2. 装入日志文件副本，正向扫描日志， 找出已经提交的事务（有begin 和commit） 把他们放入redo 队列
+3. 处理redo 队列， 把日志记录中“更新后的值”写入
+
+
+
+#### 数据转存储
+
+##### 转储类型
+
+静态转储，转储期间不允许对数据库进行操作， 优点是简单， 保持一致性， 缺点是需要等待。
+
+动态转储， 转储期间允许对数据库进行操作， 优点是效率高， 缺点是不能保持一致性， 要记录日志文件。
+
+##### 转储方式
+
+海量转储
+
+增量转储
+
+##### 登记日志的原则
+
+1. 登记次序必须严格按并发事务执行的时间次序。
+2. 必须先写日志文件， 后写数据库。
+
+
+
+#### checkpoint 机制
+
+用在log based recovery schemas 来减少recover时间。 
+
+##### checkpoint记录的内容
+
+1. 此时正在执行的事务， 也就是active的事务
+2. 这些食物最近一个日志记录的地址
+
+搜索整个日志很费时间， all 事务要undo redo from the log。 在checkpoint之前的log 可以recover的时候不用搜索。
+
+第二个原因是当stable storage 满了的时候清理log 。
+
+##### 恢复步骤
+
+1. 找到最后一个checkpoint 在日志文件中的地址
+2. 由该地址在日志文件中找到最后一个检查点记录
+3. 从检查点开始正向扫描日志文件， 直到日志文件结束。
+
+#### ARIES
+
+`Algorithm for Recovery and Isolation Exploiting Semantics(ARIES)`。如今`ARIES`成为了一种事实标准，几乎所有工业级数据库都将`ARIES`作为自己的故障恢复算法。
+
+##### LSN
+
+Uses a log sequence number (LSN) to identify log records and stores LSNs in database pages to identify which operations have been applied to a database page. 用来标记每一条log record。 一定是顺序递增的。
+
+Page LSN ， 最新对事务修改的 LSN
+
+Rec LSN， 进入内存后最早对他修改的LSN。 recent LSN。
+
+经历了RecLSN 到PageLSN的操作， 还没有stable。
+
+##### physiological redo
+
+`Physical Log`：记录数据更新前后所在`Page`的地址，在`Page`内的偏移，以及具体的字节内容，优势是回放速度快，容易`Repeat History`。
+
+`Logical Log`：记录被修改数据的逻辑地址(比如主键值)，对于数据内容，可以记录逻辑操作，比如对值操作`inc 1`，优势是占据空间小，有更好的并发效率，允许`Page`内未`Commit`的内容被其他事务移动到其他`Page`的情况下仍能正常`Rollback`。
+
+`Physiological Log`：`Physical Log`和`Logical Log`各有优劣的情况下诞生的产物，比如记录修改某个`Page`内第`#slot`个`tuple`的第`#n`列。
+
+逻辑操作中间的物理操作都可以不做， 就是只做一个逻辑操作。 逻辑日志， 可以提高并发度。
+
+##### dirty page table
+
+以减少恢复过程中不必要的重做。如前所述，脏页是指那些已经在内存中更新的页面，而磁盘上的版本不是最新的。
+
+##### fuzzy-checkpointing 
+
+只记录脏页的信息和相关信息，甚至不需要脏页写入磁盘。它在后台持续地刷新脏页，抽空写入， 而不是在检查点期间写入脏页。
+
+如果一个页面在分析过程开始时不在检查点脏页表中，检查点记录之前的重做记录不需要应用于它，因为这意味着该页面在检查点之前已经被刷到磁盘并从DirtyPageTable中移除。然而，该页可能在检查点之后被更新，这意味着它将在分析过程结束时出现在脏页表中。对于出现在检查点脏页表中的页，检查点之前的重做记录可能也需要被应用。
+
+##### checkpoint
+
+记录了dirty page table ， 和active 事务。每个事务的last LSN。 commit了就从active 事务表中去除。
+
+还有每个page的pageLSN。
+
+##### 三个pass
+
+analysis pass： 确定哪些？从last checkpoint到end of log
+
+1. undolist 
+2. which page were dirty。 得到最新的dirty page table
+3. Redo LSN； LSN from which redo should start。 redo是所有RscLSN中的最小值。
+
+Redo pass：
+
+1. repeat history ， redoing all actions from redo LSN。 
+
+   Rec LSN 和page LSN 可以优化， 不用redo已经在page中的action。
+
+Undo pass：
+
+1. 回滚所有incomplete transactions 
+
+##### 
