@@ -134,8 +134,6 @@ IndexIterator<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE> iter = index->GetBeg
 
 
 
-问题:
-
 ## parser
 
 ```
@@ -146,7 +144,7 @@ show databases;
 use db0;
 show tables;
 create table t2(d int, e char(25), f float);
-create table t1(a int, b char(0) unique, c float, primary key(a, c));
+create table t1(a int, b char(20) unique, c float, primary key(a, c));
 drop table t1;
 create index idx1 on t1(a, b);
 -- "btree" can be replaced with other index types
@@ -154,71 +152,37 @@ create index idx1 on t1(a, b) using btree;
 drop index idx1;
 show indexes;
 select * from t1;
-select id, name from t1;
+select a, b from t1;
 select * from t1 where id = 1;
 -- note: use left association
-select * from t1 where id = 1 and name = "str";
-select * from t1 where id = 1 and name = "str" or age is null and bb not null;
+select * from t1 where a = 2 and b = "str";
+select * from t1 where a = 1 and b = "str" or c is null;
 insert into t1 values(1, "aaa", 2.33);
-delete from t1;
-delete from t1 where id = 1 and amount = 2.33;
+insert into t1 values(10, "str", 4.33);
+delete from t1 where a = 2 and c = 4.33;
+update t1 set a = 1, b = "ccc" where c = 2.33;
 update t1 set c = 3;
-update t1 set a = 1, b = "ccc" where b = 2.33;
+delete from t1;
 quit;
-
 ```
 
 看图 http://dreampuf.github.io/GraphvizOnline/
 
-#### 创建数据库
+测试数据 
 
-```
-explicit DBStorageEngine(std::string db_name, bool init = true,
-                         uint32_t buffer_pool_size = DEFAULT_BUFFER_POOL_SIZE)
-                         // 新建一个数据库实例, 
-                         // 存储在哪里?
-```
+| a    | b    | c    |
+| ---- | ---- | ---- |
+| 1    | aaa  | 2.33 |
+| 2    | str  | 4.33 |
+| 3    | ccc  | null |
 
-问题:  idx = 0 , 1->100
+5. insert into t1 values(2, "str", 4.33); 但是select的时候 it++ 还是1 aaa
 
-delete有问题
+第一个rid  pageid=7 slotnum= 0，  it++ 后， slotnum=1， 
 
-```
-for (; iter != index->GetEndIterator(); ++iter) {
-!= 的时候 itr 为NULL, 所以报错.  
-因为只有节点的时候node没有赋值.
-```
+但是field还是1. 
 
 
 
-问题
 
-1. col name不对， 怀疑是 schema name最后没有截断\0
 
-Field 加了截断\0 还是不对。 
-
-create table传入之前是对的， 执行过程看了一遍也都是对的。
-
-因为 columns，  在函数中用 memheap ， ALLOC_COLUMN 在函数结束的时候会释放内存。
-
-发现的方法： gdb一步步看， 在函数return的时候会释放栈中的变量。
-
-2. 从磁盘中读取db文件时  categories manager出错。
-
-3. insert之后 select不对。 
-
-因为const char *Type::GetData(const Field &val) const  方法没有实现。 
-
-可能原因：  创建的时候没有确定type的类型， 所以是基类而不是子类。
-
-因为char.getdata有独特的包装， 需要单独判断。  
-
-但是怎么获得float 和int？ protected也不能直接访问 
-
-头疼， float转char[ ] ， 还需要新开char数组。
-
-4. ShowIndexes ，idx_info->GetIndexKeySchema()->GetColumns(); 是空的。 
-
-优先级不高， 不显示也行。 
-
-5. 
