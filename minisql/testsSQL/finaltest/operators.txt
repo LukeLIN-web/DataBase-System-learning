@@ -1,0 +1,80 @@
+# instruction 1
+
+## instruction 1.1
+
+select * from account where id = 12510134;
+
+## instruction 1.2
+
+select * from account where name = "name19342"
+
+- time=XXX
+
+---
+
+# instruction 2
+
+select id, name from account where balance >= 594.0 and balance < 595.0;
+
+---
+
+# instruction 3
+
+insert into account values(12519728, "name20345", 443.78);
+insert into account values(22356371, "name10345", 443.78);
+
+---
+
+# instruction 4
+
+## instruction 4.1
+
+create index idx01 on account(name);
+select * from account where name = "name19342";
+
+- time=XXX
+
+## instruction 4.2
+
+select * from account where name = "name14060";
+
+- time = XXX
+
+## instruction 4.3
+
+delete from account where name = "name14060";
+insert into account values(35078643, "name14060", 323.97);
+drop index idx01;
+
+## instruction 4.4
+
+select * from account where name = "name14060";
+
+- time = XXX
+
+## instruction 4.5
+
+select * from account where name = "name19342";
+
+- time = XXX
+
+---
+
+# instruction 5
+
+## instruction 5.1
+
+delete from account where balance > 465.0 or balance < 463.0;
+select * from account;
+
+
+## instruction 5.2
+
+delete from account;
+select * from account;
+
+## instruction 5.3
+
+show tables;
+drop table account;
+show tables;

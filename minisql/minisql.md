@@ -14,11 +14,7 @@ https://github.com/nefu-ljw/database-cmu15445-fall2020/blob/main/src/include/sto
 
 
 
-disk manager的具体实现方式
-
-
-
-
+disk manager
 
 1. allocatge page ,  新建了分区后 bitmap 不应该从磁盘中读出.
 2. 数据映射用小数据查看是否正确.
@@ -67,8 +63,6 @@ class IndexIterator  就会传入INDEX_TEMPLATE_ARGUMENTS
 #### 算法
 
 首先得到最左边的叶子.
-
-然后
 
 叶子节点提供了什么?
 
@@ -132,8 +126,6 @@ IndexIterator<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE> iter = index->GetBeg
   }
 ```
 
-
-
 ## parser
 
 ```
@@ -159,8 +151,8 @@ select * from t1 where a = 2 and b = "str";
 select * from t1 where a = 1 and b = "str" or c is null;
 insert into t1 values(1, "aaa", 2.33);
 insert into t1 values(10, "str", 4.33);
-delete from t1 where a = 2 and c = 4.33;
-update t1 set a = 1, b = "ccc" where c = 2.33;
+delete from t1 where a = 1; and c = 4.33;
+update t1 set a = 1, b = "ccc" where a = 1;
 update t1 set c = 3;
 delete from t1;
 quit;
@@ -178,11 +170,16 @@ quit;
 
 5. insert into t1 values(2, "str", 4.33); 但是select的时候 it++ 还是1 aaa
 
-第一个rid  pageid=7 slotnum= 0，  it++ 后， slotnum=1， 
+第一个rid  pageid=7 slotnum= 0，  it++ 后， slotnum=1， 但是field还是1. 
 
-但是field还是1. 
+原因： 迭代器没有delete原有的数据， 导致复用。
+
+6.  drop table 后， quit 会报错 。 oid DiskManager::WritePage(page_id_t, const char*): Assertion `(logical_page_id >= 0) && ("Invalid page id.")' 
 
 
 
 
 
+#### 心得
+
+第一次写这么多代码， 写了几百行代码，才体会到代码可复用的重要性，下层的代码要是接口不好，上面每一次使用都要多写很多代码。 导致part5无限冗长。
