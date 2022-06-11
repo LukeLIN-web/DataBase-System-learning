@@ -128,8 +128,11 @@ IndexIterator<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE> iter = index->GetBeg
 
 ## parser
 
+unique 和primary 冲突没有处理。。。就是纯粹忘记了。 哎， 还是覆盖的面不够， 不仅要深挖， 还要保证基本功能都会了。
+
 ```
-execfile "sql.txt";
+execfile "sql.txt"; execfile "account01.sql";
+execfile "account01.sql";
 create database db0;
 drop database db0;
 show databases;
@@ -156,6 +159,9 @@ update t1 set a = 1, b = "ccc" where a = 1;
 update t1 set c = 3;
 delete from t1;
 quit;
+create index idx01 on account(name);
+select * from account;"name10001"
+select * from account where name = "name19999";
 ```
 
 看图 http://dreampuf.github.io/GraphvizOnline/
@@ -176,10 +182,9 @@ quit;
 
 6.  drop table 后， quit 会报错 。 oid DiskManager::WritePage(page_id_t, const char*): Assertion `(logical_page_id >= 0) && ("Invalid page id.")' 
 
+lt的感想：
 
+1. 单测不完备， 本来每个公开的方法都要单测。 缺乏系统级测试， 测试性能。 模拟一些。 
 
+持久化可以多写点， 只有两个组实现了 ，可以作为亮点。
 
-
-#### 心得
-
-第一次写这么多代码， 写了几百行代码，才体会到代码可复用的重要性，下层的代码要是接口不好，上面每一次使用都要多写很多代码。 导致part5无限冗长。

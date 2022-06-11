@@ -6,7 +6,7 @@ select * from account where id = 12510134;
 
 ## instruction 1.2
 
-select * from account where name = "name19342"
+select * from account where name = "name19342";
 
 - time=XXX
 
