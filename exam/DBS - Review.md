@@ -8,6 +8,25 @@ relational model, keys
 
 relational algebra
 
+取消nested subquery， 就是先两个表自然连接， 其中一个表选择， 得到一张表之后再自然连接。
+
+Year（detail.cdate）= 2018, 可以取出日期的年。
+
+having count (distinct campus) = 1 就是只有一个campus
+
+要找最大， 就是 sum() >=all
+
+```sql
+insert into deatilt( 对应的 attri) 
+values ( )
+日期和string都需要单引号。
+ update card
+ set balance = balance -20 
+where cno = 'c0002';
+```
+
+
+
 ## Chap. 3 Introduction to SQL
 
 ## Chap. 4 Intermediate SQL
@@ -163,6 +182,30 @@ join
 materialization
 
 pipelining - demand driven (lazy, pull), producer driven (eager, push)
+
+
+
+1. size。
+
+record数量相乘/
+
+2. number of block 。
+
+   就是 block size /Icard
+
+3. height of B+树
+
+fanout。（4096-4）/（key size+ value size ） +1。
+
+min hieght  log 455（100000）  向上取整。=2  就是满树
+
+4.  计算出每一步的block transfer 次数， seek time。 
+
+block number 就是tT的次数， 
+
+
+
+
 
 ## Chap. 13 Query Optimization
 
